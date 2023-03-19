@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -13,7 +14,17 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.userRepository.save(createUserDto);
+    const isEmailUsed = await this.userRepository.findOneBy({
+      email: createUserDto.email,
+    });
+    if (isEmailUsed) throw new BadRequestException('Email already in Use.');
+    createUserDto.password = hashSync(
+      createUserDto.password,
+      Number(process.env.HASH_SALT),
+    );
+    const createdUser = await this.userRepository.save(createUserDto);
+    delete createdUser.password;
+    return createdUser;
   }
 
   async findAll() {
