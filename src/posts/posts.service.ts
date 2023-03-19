@@ -36,6 +36,16 @@ export class PostsService {
     return await this.postRepository.findOneBy({ id });
   }
 
+  async findByUser(id: string) {
+    return await this.postRepository.find({
+      where: {
+        user: {
+          id: id,
+        },
+      },
+    });
+  }
+
   async update(id: string, updatePostDto: UpdatePostDto) {
     if (Object.keys(updatePostDto).length === 0)
       throw new BadRequestException('No Update Parameters');
