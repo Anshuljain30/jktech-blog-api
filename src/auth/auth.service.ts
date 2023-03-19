@@ -12,6 +12,7 @@ export class AuthService {
 
   async validateCredentials(email: string, password: string) {
     const user = await this.userService.find(email);
+    if (!user) throw new UnauthorizedException('Invalid Email');
     if (!compareSync(password, user.password)) {
       throw new UnauthorizedException('Invalid Credentials');
     }
@@ -19,7 +20,7 @@ export class AuthService {
   }
 
   async loginWithCredential(user: any) {
-    const payload = { email: user.email };
+    const payload = { email: user.email, id: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
