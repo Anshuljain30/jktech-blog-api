@@ -35,6 +35,10 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
+  async find(email: string) {
+    return await this.userRepository.findOneBy({ email });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (Object.keys(updateUserDto).length === 0)
       throw new BadRequestException('No Update Parameters');
