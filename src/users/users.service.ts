@@ -50,6 +50,7 @@ export class UsersService {
       ...user,
       ...updateUserDto,
     });
+    delete updatedUser.password;
     return updatedUser;
   }
 
