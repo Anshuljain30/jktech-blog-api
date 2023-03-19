@@ -50,7 +50,10 @@ export class PostsService {
     return updatedPost;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    const post = await this.postRepository.findOneBy({ id });
+    if (!post)
+      throw new BadRequestException('Post not found with provided ID.');
+    return await this.postRepository.remove(post);
   }
 }
