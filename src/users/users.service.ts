@@ -35,8 +35,23 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    if (Object.keys(updateUserDto).length === 0)
+      throw new BadRequestException('No Update Parameters');
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user)
+      throw new BadRequestException('User not found with provided ID.');
+    if (updateUserDto.password)
+      updateUserDto.password = hashSync(
+        updateUserDto.password,
+        Number(process.env.HASH_SALT),
+      );
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
+    delete updatedUser.password;
+    return updatedUser;
   }
 
   remove(id: number) {
