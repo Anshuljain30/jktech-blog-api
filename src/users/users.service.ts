@@ -23,6 +23,7 @@ export class UsersService {
       Number(process.env.HASH_SALT),
     );
     const createdUser = await this.userRepository.save(createUserDto);
+    delete createdUser.password;
     return createdUser;
   }
 
