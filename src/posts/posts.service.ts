@@ -24,7 +24,6 @@ export class PostsService {
       throw new BadRequestException('User not found with provided UserID.');
     delete createPostDto.userId;
     const post = await this.postRepository.save(createPostDto);
-    console.log(post.user);
     delete post.user;
     return post;
   }
@@ -37,8 +36,18 @@ export class PostsService {
     return await this.postRepository.findOneBy({ id });
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    if (Object.keys(updatePostDto).length === 0)
+      throw new BadRequestException('No Update Parameters');
+    const post = await this.postRepository.findOneBy({ id });
+    if (!post)
+      throw new BadRequestException('Post not found with provided ID.');
+    const updatedPost = await this.postRepository.save({
+      ...post,
+      ...updatePostDto,
+    });
+    delete post.user;
+    return updatedPost;
   }
 
   remove(id: number) {
