@@ -4,6 +4,10 @@
 - Stake - NestJS, MySQL (TypeORM)
 - No static page served, Use Postman to test API, Import Collection.
 
+### What's not working
+
+[x] Test Framwork
+
 # How to go up and running
 
 - ### Local env
