@@ -1,30 +1,36 @@
-FROM node:16.19-alpine3.16 AS development
+# Build stage
+FROM node:18-alpine AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
-RUN npm install glob rimraf
+# Install dependencies
+RUN npm install
 
-RUN npm install --only=development
-
+# Copy source code
 COPY . .
 
+# Build the application
 RUN npm run build
 
-FROM node:16.19-alpine3.16 as production
+# Production stage
+FROM node:18-alpine
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
+# Copy package files
 COPY package*.json ./
 
+# Install production dependencies only
 RUN npm install --only=production
 
-COPY . .
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
 
-COPY --from=development /usr/src/app/dist ./dist
+# Expose the port the app runs on
+EXPOSE 3000
 
-CMD ["node", "dist/main"]
+# Command to run the application
+CMD ["npm", "run", "start:prod"] 
